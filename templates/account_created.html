@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Account Created | LockForgeX</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+  <div class="container">
+    <h1>✅ Account Created</h1>
+    <p class="tagline">Welcome to LockForgeX, {{ name }}!</p>
+    <p>Your account has been successfully created.</p>
+    <button onclick="window.location.href='/login'">Log In Now</button>
+  </div>
+</body>
+
+</html>
