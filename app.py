@@ -1,36 +1,18 @@
 from flask import Flask, render_template, request, redirect, session
-import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
+from pymongo import MongoClient
+import os
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key_here'  # Replace with a strong secret in production
+# Use your provided secret key
+app.secret_key = "84251379358517826681762094589523"
 
-# 🔒 Initialize database and users table
-def init_db():
-    conn = sqlite3.connect("users.db")
-    c = conn.cursor()
-    # Users table
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            email TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL
-        )
-    """)
-    # Passwords table
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS passwords (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user TEXT NOT NULL,
-            service TEXT NOT NULL,
-            password TEXT NOT NULL
-        )
-    """)
-    conn.commit()
-    conn.close()
-
-init_db()
+# MongoDB Atlas connection
+MONGODB_URI = "mongodb+srv://lockforgex:556677889900@lockforgex.v4uoa2q.mongodb.net/lockforgex?retryWrites=true&w=majority&appName=lockforgex"
+client = MongoClient(MONGODB_URI)
+db = client.lockforgex
+users_col = db.users
+passwords_col = db.passwords
 
 # 🏠 Home route
 @app.route('/')
@@ -53,15 +35,14 @@ def signup():
 
         hashed_password = generate_password_hash(password)
 
-        conn = sqlite3.connect("users.db")
-        c = conn.cursor()
-        try:
-            c.execute("INSERT INTO users (name, email, password) VALUES (?, ?, ?)", (name, email, hashed_password))
-            conn.commit()
-        except sqlite3.IntegrityError:
-            conn.close()
+        if users_col.find_one({"email": email}):
             return "⚠️ Email already registered."
-        conn.close()
+
+        users_col.insert_one({
+            "name": name,
+            "email": email,
+            "password": hashed_password
+        })
         return render_template('account_created.html', name=name)
     return render_template('signup.html')
 
@@ -72,14 +53,9 @@ def login():
         email = request.form['email']
         password = request.form['password']
 
-        conn = sqlite3.connect("users.db")
-        c = conn.cursor()
-        c.execute("SELECT name, password FROM users WHERE email=?", (email,))
-        result = c.fetchone()
-        conn.close()
-
-        if result and check_password_hash(result[1], password):
-            session['user'] = result[0]  # Store name in session
+        user = users_col.find_one({"email": email})
+        if user and check_password_hash(user['password'], password):
+            session['user'] = user['name']
             return redirect('/dashboard')
         else:
             return "❌ Invalid email or password."
@@ -92,11 +68,8 @@ def dashboard():
         return redirect('/login')
     user = session['user']
 
-    conn = sqlite3.connect("users.db")
-    c = conn.cursor()
-    c.execute("SELECT service, password FROM passwords WHERE user=?", (user,))
-    passwords = [{'service': row[0], 'password': row[1]} for row in c.fetchall()]
-    conn.close()
+    saved = passwords_col.find({"user": user})
+    passwords = [{"service": s["service"], "password": s["password"]} for s in saved]
 
     return render_template('dashboard.html', username=user, passwords=passwords)
 
@@ -116,11 +89,11 @@ def save_password():
     password = request.form['password']
     user = session['user']
 
-    conn = sqlite3.connect("users.db")
-    c = conn.cursor()
-    c.execute("INSERT INTO passwords (user, service, password) VALUES (?, ?, ?)", (user, service, password))
-    conn.commit()
-    conn.close()
+    passwords_col.insert_one({
+        "user": user,
+        "service": service,
+        "password": password
+    })
     return '', 200
 
 # 🚀 Run the app
