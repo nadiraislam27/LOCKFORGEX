@@ -13,14 +13,48 @@
     <h1>Welcome, {{ username }} 👋</h1>
     <p class="tagline">Forge your secure password below</p>
 
+    <!-- Password Generator Section -->
     <div class="generator">
       <label for="length">Password Length: <span id="lengthValue">16</span></label>
       <input type="range" id="length" min="8" max="64" value="16" />
 
+      <div class="options">
+        <label><input type="checkbox" id="uppercase" checked> Uppercase</label>
+        <label><input type="checkbox" id="lowercase" checked> Lowercase</label>
+        <label><input type="checkbox" id="numbers" checked> Numbers</label>
+        <label><input type="checkbox" id="symbols" checked> Symbols</label>
+      </div>
+
       <button onclick="generatePassword()">Generate Password</button>
       <input type="text" id="output" readonly />
       <button onclick="copyToClipboard()">Copy Password</button>
+
+      <input type="text" id="serviceInput" placeholder="Enter service name" />
+      <button onclick="savePassword()">Save Password</button>
     </div>
+
+    <!-- Saved Passwords Table -->
+    <h2>Saved Passwords</h2>
+    <table id="savedPasswords">
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>Password</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in passwords %}
+        <tr>
+          <td>{{ entry.service }}</td>
+          <td>{{ entry.password }}</td>
+          <td>
+            <button onclick="copySavedPassword('{{ entry.password }}')">Copy</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 
     <p class="link"><a href="/logout">Log out</a></p>
   </div>

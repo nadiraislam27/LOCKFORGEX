@@ -4,15 +4,15 @@
   padding: 0;
   box-sizing: border-box;
 }
+
 body {
   font-family: 'Segoe UI', sans-serif;
   background: radial-gradient(circle at top left, #0f2027, #203a43, #2c5364);
   color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 /* Container */
@@ -24,7 +24,8 @@ body {
   box-shadow: 0 0 40px rgba(0, 255, 255, 0.3);
   text-align: center;
   width: 90%;
-  max-width: 500px;
+  max-width: 600px;
+  margin: 50px auto; /* center horizontally with top/bottom margin */
   animation: fadeIn 0.8s ease-in-out;
 }
 
@@ -35,9 +36,15 @@ h1 {
   color: #00ffff;
   text-shadow: 0 0 10px #00ffff;
 }
+
+h2 {
+  margin-top: 30px;
+  color: #00ffff;
+}
+
 .tagline {
   font-style: italic;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   color: #ccc;
 }
 
@@ -54,6 +61,7 @@ form input,
   font-size: 1em;
   text-align: center;
 }
+
 input::placeholder {
   color: #aaa;
 }
@@ -68,8 +76,9 @@ button {
   border-radius: 10px;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.3s ease;
-  margin: 10px 0;
+  margin: 5px 2px;
 }
+
 button:hover {
   transform: scale(1.05);
   box-shadow: 0 0 15px #00ffff;
@@ -86,10 +95,12 @@ input[type='range'] {
   margin-top: 20px;
   font-size: 0.9em;
 }
+
 .link a {
   color: #00ffff;
   text-decoration: none;
 }
+
 .link a:hover {
   text-decoration: underline;
 }
@@ -101,12 +112,44 @@ input[type='range'] {
   font-size: 1.1em;
 }
 
+/* Password Options */
+.options {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.options label {
+  font-size: 0.9em;
+}
+
+/* Table for saved passwords */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+th,
+td {
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: left;
+}
+
+th {
+  background: rgba(0, 255, 255, 0.2);
+}
+
 /* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -117,8 +160,15 @@ input[type='range'] {
 @media screen and (max-width: 600px) {
   .container {
     padding: 20px;
+    margin: 20px auto;
   }
+
   h1 {
     font-size: 2em;
+  }
+
+  .options {
+    flex-direction: column;
+    align-items: center;
   }
 }
