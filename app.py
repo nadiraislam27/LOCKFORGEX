@@ -1,14 +1,13 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from pymongo import MongoClient
 import os
 
 app = Flask(__name__)
-# Use your provided secret key
-app.secret_key = "84251379358517826681762094589523"
+app.secret_key = "84251379358517826681762094589523"  # Your secret key
 
 # MongoDB Atlas connection
-MONGODB_URI = "mongodb+srv://lockforgex:556677889900@lockforgex.v4uoa2q.mongodb.net/lockforgex?retryWrites=true&w=majority&appName=lockforgex"
+MONGODB_URI = "mongodb+srv://lockforgex:22334455@lockforgex.v4uoa2q.mongodb.net/lockforgex"
 client = MongoClient(MONGODB_URI)
 db = client.lockforgex
 users_col = db.users
@@ -21,7 +20,7 @@ def home():
         return redirect('/dashboard')
     return redirect('/login')
 
-# 📝 Signup route
+# 📝 Signup
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -33,11 +32,10 @@ def signup():
         if password != confirm:
             return "⚠️ Passwords do not match."
 
-        hashed_password = generate_password_hash(password)
-
         if users_col.find_one({"email": email}):
             return "⚠️ Email already registered."
 
+        hashed_password = generate_password_hash(password)
         users_col.insert_one({
             "name": name,
             "email": email,
@@ -46,7 +44,7 @@ def signup():
         return render_template('account_created.html', name=name)
     return render_template('signup.html')
 
-# 🔑 Login route
+# 🔑 Login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -61,29 +59,21 @@ def login():
             return "❌ Invalid email or password."
     return render_template('login.html')
 
-# 🧠 Dashboard route
+# 🧠 Dashboard
 @app.route('/dashboard')
 def dashboard():
     if 'user' not in session:
         return redirect('/login')
     user = session['user']
-
-    saved = passwords_col.find({"user": user})
-    passwords = [{"service": s["service"], "password": s["password"]} for s in saved]
-
+    saved_passwords = passwords_col.find({"user": user})
+    passwords = [{"service": p["service"], "password": p["password"]} for p in saved_passwords]
     return render_template('dashboard.html', username=user, passwords=passwords)
 
-# 🚪 Logout route
-@app.route('/logout')
-def logout():
-    session.pop('user', None)
-    return redirect('/login')
-
-# 💾 Save password route
+# 💾 Save password
 @app.route('/save_password', methods=['POST'])
 def save_password():
     if 'user' not in session:
-        return "Unauthorized", 401
+        return jsonify({"error": "Unauthorized"}), 401
 
     service = request.form['service']
     password = request.form['password']
@@ -94,7 +84,19 @@ def save_password():
         "service": service,
         "password": password
     })
-    return '', 200
+    return jsonify({"message": "Password saved!"}), 200
+
+# 🚪 Logout
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return redirect('/login')
+
+# 🔎 Optional: test route to view all saved passwords (for debugging)
+@app.route('/all_passwords')
+def all_passwords():
+    all_data = list(passwords_col.find({}, {"_id": 0}))
+    return jsonify(all_data)
 
 # 🚀 Run the app
 if __name__ == '__main__':

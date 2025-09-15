@@ -4,15 +4,15 @@
   padding: 0;
   box-sizing: border-box;
 }
-
 body {
   font-family: 'Segoe UI', sans-serif;
   background: radial-gradient(circle at top left, #0f2027, #203a43, #2c5364);
   color: #fff;
-  margin: 0;
-  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
   min-height: 100vh;
-  overflow-x: hidden;
+  padding-top: 40px;
 }
 
 /* Container */
@@ -25,7 +25,6 @@ body {
   text-align: center;
   width: 90%;
   max-width: 600px;
-  margin: 50px auto; /* center horizontally with top/bottom margin */
   animation: fadeIn 0.8s ease-in-out;
 }
 
@@ -36,12 +35,6 @@ h1 {
   color: #00ffff;
   text-shadow: 0 0 10px #00ffff;
 }
-
-h2 {
-  margin-top: 30px;
-  color: #00ffff;
-}
-
 .tagline {
   font-style: italic;
   margin-bottom: 20px;
@@ -50,7 +43,8 @@ h2 {
 
 /* Forms & Inputs */
 form input,
-.generator input[type='text'] {
+.generator input[type='text'],
+.generator select {
   width: 100%;
   padding: 12px;
   margin: 10px 0;
@@ -61,7 +55,6 @@ form input,
   font-size: 1em;
   text-align: center;
 }
-
 input::placeholder {
   color: #aaa;
 }
@@ -71,14 +64,13 @@ button {
   background: linear-gradient(90deg, #00ffff, #00e6e6);
   color: #000;
   border: none;
-  padding: 12px 20px;
+  padding: 10px 20px;
   font-size: 1em;
   border-radius: 10px;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.3s ease;
-  margin: 5px 2px;
+  margin: 10px 0;
 }
-
 button:hover {
   transform: scale(1.05);
   box-shadow: 0 0 15px #00ffff;
@@ -87,7 +79,7 @@ button:hover {
 /* Range Slider */
 input[type='range'] {
   width: 100%;
-  margin: 20px 0;
+  margin: 10px 0 20px;
 }
 
 /* Links */
@@ -95,12 +87,10 @@ input[type='range'] {
   margin-top: 20px;
   font-size: 0.9em;
 }
-
 .link a {
   color: #00ffff;
   text-decoration: none;
 }
-
 .link a:hover {
   text-decoration: underline;
 }
@@ -112,35 +102,44 @@ input[type='range'] {
   font-size: 1.1em;
 }
 
-/* Password Options */
-.options {
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
+/* Saved Passwords List */
+#savedPasswords {
+  list-style: none;
+  text-align: left;
+  margin-top: 20px;
+  padding: 0;
 }
-
-.options label {
+#savedPasswords li {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#savedPasswords li button {
+  margin: 0;
+  padding: 5px 10px;
   font-size: 0.9em;
 }
 
-/* Table for saved passwords */
-table {
-  width: 100%;
-  border-collapse: collapse;
+/* Popup for Memory Tip */
+.popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 255, 255, 0.1);
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px #00ffff;
+  z-index: 1000;
+  text-align: center;
+}
+.popup button {
   margin-top: 15px;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-th,
-td {
-  padding: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  text-align: left;
-}
-
-th {
-  background: rgba(0, 255, 255, 0.2);
 }
 
 /* Animations */
@@ -149,7 +148,6 @@ th {
     opacity: 0;
     transform: translateY(20px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -160,15 +158,8 @@ th {
 @media screen and (max-width: 600px) {
   .container {
     padding: 20px;
-    margin: 20px auto;
   }
-
   h1 {
     font-size: 2em;
-  }
-
-  .options {
-    flex-direction: column;
-    align-items: center;
   }
 }

@@ -18,45 +18,40 @@
       <label for="length">Password Length: <span id="lengthValue">16</span></label>
       <input type="range" id="length" min="8" max="64" value="16" />
 
-      <div class="options">
-        <label><input type="checkbox" id="uppercase" checked> Uppercase</label>
-        <label><input type="checkbox" id="lowercase" checked> Lowercase</label>
-        <label><input type="checkbox" id="numbers" checked> Numbers</label>
-        <label><input type="checkbox" id="symbols" checked> Symbols</label>
-      </div>
+      <label for="type">Password Type:</label>
+      <select id="type">
+        <option value="all">All Characters</option>
+        <option value="upper">Uppercase Only</option>
+        <option value="lower">Lowercase Only</option>
+        <option value="number">Numbers Only</option>
+      </select>
 
       <button onclick="generatePassword()">Generate Password</button>
       <input type="text" id="output" readonly />
       <button onclick="copyToClipboard()">Copy Password</button>
 
-      <input type="text" id="serviceInput" placeholder="Enter service name" />
+      <input type="text" id="service" placeholder="Service Name (e.g., Facebook)" />
       <button onclick="savePassword()">Save Password</button>
     </div>
 
-    <!-- Saved Passwords Table -->
+    <!-- Saved Passwords -->
     <h2>Saved Passwords</h2>
-    <table id="savedPasswords">
-      <thead>
-        <tr>
-          <th>Service</th>
-          <th>Password</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for entry in passwords %}
-        <tr>
-          <td>{{ entry.service }}</td>
-          <td>{{ entry.password }}</td>
-          <td>
-            <button onclick="copySavedPassword('{{ entry.password }}')">Copy</button>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <ul id="savedPasswords">
+      {% for p in passwords %}
+      <li>
+        <strong>{{ p.service }}:</strong> {{ p.password }}
+        <button onclick="copySavedPassword('{{ p.password }}')">Copy</button>
+      </li>
+      {% endfor %}
+    </ul>
 
     <p class="link"><a href="/logout">Log out</a></p>
+  </div>
+
+  <!-- Memory Tips Popup -->
+  <div id="tipPopup" class="popup">
+    <p id="tipText"></p>
+    <button onclick="closeTip()">Close</button>
   </div>
 </body>
 
